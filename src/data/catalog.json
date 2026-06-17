@@ -1,0 +1,140 @@
+{
+  "categories": [
+    { 
+      "id": "all", 
+      "label": "All",
+      "subcategories": []
+    },
+    { 
+      "id": "essentials", 
+      "label": "Essentials",
+      "subcategories": [
+        { "id": "tools", "label": "Tools & Equipment" },
+        { "id": "bowls", "label": "Mixing Bowls" }
+      ]
+    },
+    { 
+      "id": "cakes", 
+      "label": "Cake Mixes",
+      "subcategories": [
+        { "id": "chocolate", "label": "Chocolate" },
+        { "id": "vanilla", "label": "Vanilla" },
+        { "id": "fruit", "label": "Fruit Flavors" }
+      ]
+    },
+    { 
+      "id": "flavors", 
+      "label": "Flavors",
+      "subcategories": [
+        { "id": "extracts", "label": "Extracts" },
+        { "id": "syrups", "label": "Syrups" }
+      ]
+    },
+    { 
+      "id": "decor", 
+      "label": "Decor",
+      "subcategories": [
+        { "id": "sprinkles", "label": "Sprinkles" },
+        { "id": "toppers", "label": "Toppers" }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "cake-mixing-essentials-kit",
+      "name": "Cake Mixing Essentials Kit",
+      "price": 899,
+      "image": "essentials",
+      "tag": "Bestseller",
+      "category": "essentials",
+      "subcategory": "tools",
+      "description": "A complete kit for any home baker — mixing bowls, spatula, whisk, and measuring spoons. Crafted from food-grade materials.",
+      "rating": 4.8,
+      "stock": 24
+    },
+    {
+      "id": "butterscotch-essence-50ml",
+      "name": "Butterscotch Essence 50ml",
+      "price": 149,
+      "image": "essentials",
+      "tag": "New",
+      "category": "flavors",
+      "subcategory": "extracts",
+      "description": "Rich, caramel-forward butterscotch essence perfect for cakes, ice creams, and frostings.",
+      "rating": 4.6,
+      "stock": 80
+    },
+    {
+      "id": "chocolate-premix-500g",
+      "name": "Chocolate Premix 500g",
+      "price": 349,
+      "image": "cake",
+      "tag": "Sale",
+      "category": "cakes",
+      "subcategory": "chocolate",
+      "description": "Premium cocoa-rich chocolate cake premix. Just add water, oil, and bake — bakery-style cake every time.",
+      "rating": 4.7,
+      "stock": 50
+    },
+    {
+      "id": "measuring-spoon-cup-set",
+      "name": "Measuring Spoon & Cup Set",
+      "price": 299,
+      "image": "essentials",
+      "tag": null,
+      "category": "essentials",
+      "subcategory": "tools",
+      "description": "Stainless steel measuring cups and spoons set. Accurate measurements for perfect bakes.",
+      "rating": 4.5,
+      "stock": 35
+    },
+    {
+      "id": "pink-vanilla-cupcake-mix",
+      "name": "Pink Vanilla Cupcake Mix",
+      "price": 249,
+      "image": "hero",
+      "tag": "Popular",
+      "category": "cakes",
+      "subcategory": "vanilla",
+      "description": "Soft, fluffy pink vanilla cupcakes in 30 minutes. Yields 12 cupcakes per pack.",
+      "rating": 4.9,
+      "stock": 60
+    },
+    {
+      "id": "premium-mixing-bowl",
+      "name": "Premium Mixing Bowl",
+      "price": 499,
+      "image": "essentials",
+      "tag": null,
+      "category": "essentials",
+      "subcategory": "bowls",
+      "description": "Heavy-duty stainless steel mixing bowl with non-slip base. 2.5L capacity.",
+      "rating": 4.6,
+      "stock": 18
+    },
+    {
+      "id": "strawberry-cake-mix-400g",
+      "name": "Strawberry Cake Mix 400g",
+      "price": 329,
+      "image": "cake",
+      "tag": "Sale",
+      "category": "cakes",
+      "subcategory": "fruit",
+      "description": "Real strawberry flavor cake mix with a gorgeous natural pink crumb.",
+      "rating": 4.4,
+      "stock": 40
+    },
+    {
+      "id": "rainbow-sprinkles-100g",
+      "name": "Rainbow Sprinkles 100g",
+      "price": 179,
+      "image": "hero",
+      "tag": null,
+      "category": "decor",
+      "subcategory": "sprinkles",
+      "description": "Vibrant rainbow sugar sprinkles — perfect topping for cupcakes, cakes, and donuts.",
+      "rating": 4.7,
+      "stock": 100
+    }
+  ]
+}
