@@ -3,7 +3,11 @@ import cake from "@/assets/cake-product.jpg";
 import hero from "@/assets/hero-cupcake.jpg";
 import catalog from "@/data/catalog.json";
 
-export type Category = { id: string; label: string };
+export type Category = {
+  id: string;
+  label: string;
+  subcategories?: { id: string; label: string }[];
+};
 
 export type Product = {
   id: string;
@@ -11,11 +15,40 @@ export type Product = {
   price: number;
   image: string;
   tag?: string | null;
-  category: "essentials" | "cakes" | "flavors" | "decor";
+  category: string;
+  subcategory?: string;
   description: string;
   rating: number;
   stock: number;
 };
+
+export function buildCategoriesFromProducts(products: Product[]) {
+  const map = new Map<string, Set<string>>();
+
+  for (const p of products) {
+    const category = p.category?.trim();
+    const subcategory = p.subcategory?.trim();
+    if (!category) continue;
+
+    if (!map.has(category)) map.set(category, new Set());
+    if (subcategory) map.get(category)!.add(subcategory);
+  }
+
+  const categories: Category[] = [{ id: "all", label: "All", subcategories: [] }];
+
+  [...map.keys()]
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((category) => {
+      const subs = [...map.get(category)!].sort((a, b) => a.localeCompare(b));
+      categories.push({
+        id: category,
+        label: category,
+        subcategories: subs.map((sub) => ({ id: sub, label: sub })),
+      });
+    });
+
+  return categories;
+}
 
 const imageMap: Record<string, string> = { essentials, cake, hero };
 

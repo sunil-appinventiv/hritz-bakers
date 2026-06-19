@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
-import { formatINR, categories } from "@/lib/products";
+import { formatINR, buildCategoriesFromProducts } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useState, useMemo, useEffect } from "react";
 import { Minus, Plus, Loader2 } from "lucide-react";
@@ -43,6 +43,11 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  const categories = useMemo(
+    () => buildCategoriesFromProducts(productsList),
+    [productsList],
+  );
+
   const activeCategoryObj = categories.find((c) => c.id === cat);
 
   const visible = useMemo(() => {
@@ -77,21 +82,23 @@ export default function Products() {
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="flex flex-col md:flex-row gap-4 md:items-start md:justify-between mb-8">
           <div className="flex-1">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => handleCategoryChange(c.id)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium border transition ${
-                    cat === c.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background border-border hover:bg-muted"
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
+            {!loading && categories.length > 1 && (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => handleCategoryChange(c.id)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium border transition ${
+                      cat === c.id
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background border-border hover:bg-muted"
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {activeCategoryObj?.subcategories?.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3 pl-2 border-l-2 border-primary/20">
