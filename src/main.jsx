@@ -1,14 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "sonner";
 
 import App from "./App";
-import { ThemeProvider } from "./context/ThemeContext";
+import { CartProvider } from "./context/CartContext";
+import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-       <ThemeProvider>
+  <React.StrictMode>
+    <BrowserRouter>
+      <CartProvider>
         <App />
-      </ThemeProvider>
-   </BrowserRouter>
+        <Toaster position="top-right" richColors />
+      </CartProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
 );

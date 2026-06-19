@@ -1,48 +1,49 @@
-import { Link } from "@tanstack/react-router";
-import { ReactNode, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { useState } from "react";
 import { Menu, X, ShoppingBag, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { SITE } from "@/lib/site";
-import Logo from '../assets/logo1.jpg';
-function NavLinks({ onClick }: { onClick?: () => void }) {
+import Logo from "../assets/logo1.jpg";
+
+function NavLinks({ onClick }) {
   const items = [
     { to: "/", label: "Home" },
     { to: "/products", label: "Products" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
-  ] as const;
+  ];
+
   return (
     <>
       {items.map((it) => (
-        <Link
+        <NavLink
           key={it.to}
           to={it.to}
+          end={it.to === "/"}
           onClick={onClick}
-          activeOptions={{ exact: it.to === "/" }}
-          className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-          activeProps={{ className: "text-primary font-semibold" }}
+          className={({ isActive }) =>
+            isActive
+              ? "text-sm font-semibold text-primary transition-colors"
+              : "text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+          }
         >
           {it.label}
-        </Link>
+        </NavLink>
       ))}
     </>
   );
 }
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default function SiteLayout({ children }) {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img
-              src={Logo}
-              alt={SITE.name}
-              className="h-14 w-auto object-contain"
-            />
-             {/* <span className="text-xl font-bold tracking-tight">{SITE.name}</span> */}
+            <img src={Logo} alt={SITE.name} className="h-14 w-auto object-contain" />
           </Link>
           <nav className="hidden md:flex items-center gap-7">
             <NavLinks />
@@ -90,31 +91,55 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <footer className="border-t border-border bg-secondary/40 mt-16">
         <div className="mx-auto max-w-6xl px-4 py-12 grid gap-8 md:grid-cols-3">
           <div>
-           <img
-              src={Logo}
-              alt={SITE.name}
-              className="h-20 w-auto object-contain"
-            />
+            <img src={Logo} alt={SITE.name} className="h-20 w-auto object-contain" />
             <p className="text-sm text-muted-foreground">
-              Premium baking essentials, cake mixes, and decorating tools for home
-              bakers and professionals.
+              Premium baking essentials, cake mixes, and decorating tools for home bakers and
+              professionals.
             </p>
           </div>
           <div>
             <h4 className="font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/" className="hover:text-primary">Home</Link></li>
-              <li><Link to="/products" className="hover:text-primary">Products</Link></li>
-              <li><Link to="/cart" className="hover:text-primary">Cart</Link></li>
-              <li><Link to="/about" className="hover:text-primary">About</Link></li>
-              <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
+              <li>
+                <Link to="/" className="hover:text-primary">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/products" className="hover:text-primary">
+                  Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/cart" className="hover:text-primary">
+                  Cart
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-primary">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-primary">
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-3">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href={`mailto:${SITE.email}`} className="hover:text-primary">{SITE.email}</a></li>
-              <li><a href={`tel:+91${SITE.phoneRaw}`} className="hover:text-primary">{SITE.phone}</a></li>
+              <li>
+                <a href={`mailto:${SITE.email}`} className="hover:text-primary">
+                  {SITE.email}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:+91${SITE.phoneRaw}`} className="hover:text-primary">
+                  {SITE.phone}
+                </a>
+              </li>
               <li>{SITE.address}</li>
             </ul>
           </div>

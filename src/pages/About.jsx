@@ -1,28 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
 import SiteLayout from "@/components/SiteLayout";
 import { Cake, Users, Award } from "lucide-react";
 import essentials from "@/assets/baking-essentials.jpg";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Us — Hritz Baker Mart" },
-      {
-        name: "description",
-        content:
-          "Learn about Hritz Baker Mart — our story, mission, and passion for bringing premium baking supplies to home bakers across India.",
-      },
-      { property: "og:title", content: "About Us — Hritz Baker Mart" },
-      {
-        property: "og:description",
-        content: "Our story and passion for baking.",
-      },
-    ],
-  }),
-  component: AboutPage,
-});
+export default function About() {
+  usePageTitle("About Us — Hritz Baker Mart");
 
-function AboutPage() {
   return (
     <SiteLayout>
       <section className="bg-secondary/40 py-16">
@@ -45,13 +28,13 @@ function AboutPage() {
           <h2 className="text-3xl font-bold">Our Story</h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
             Hritz Baker Mart started with a simple idea — quality baking shouldn't be a
-            luxury. Founded by a small team of home bakers and pastry enthusiasts,
-            we curate the finest ingredients, tools, and decorating supplies so
-            you can create magic in your kitchen.
+            luxury. Founded by a small team of home bakers and pastry enthusiasts, we curate
+            the finest ingredients, tools, and decorating supplies so you can create magic in
+            your kitchen.
           </p>
           <p className="mt-3 text-muted-foreground leading-relaxed">
-            From flavoring essences and premium mixes to professional-grade
-            tools, every product we offer is tested by bakers like you.
+            From flavoring essences and premium mixes to professional-grade tools, every
+            product we offer is tested by bakers like you.
           </p>
         </div>
       </section>

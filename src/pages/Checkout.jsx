@@ -1,44 +1,24 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { useCart } from "@/context/CartContext";
 import { formatINR } from "@/lib/products";
 import { useState } from "react";
 import { Lock } from "lucide-react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-export const Route = createFileRoute("/checkout")({
-  head: () => ({
-    meta: [
-      { title: "Checkout — Hritz Baker Mart" },
-      { name: "description", content: "Securely complete your Hritz Baker Mart order for premium baking essentials and cake supplies." },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: CheckoutPage,
-});
+export default function Checkout() {
+  usePageTitle("Checkout — Hritz Baker Mart");
 
-type Form = {
-  email: string;
-  name: string;
-  phone: string;
-  address: string;
-  landmark: string; 
-  city: string;
-  pincode: string;
-  state: string;
-  payment: "cod" | "card" | "upi";
-};
-
-function CheckoutPage() {
   const { detailedItems, subtotal, shipping, total, count, clear } = useCart();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-  
-  const [form, setForm] = useState<Form>({
+
+  const [form, setForm] = useState({
     email: "",
     name: "",
     phone: "",
     address: "",
-    landmark: "", 
+    landmark: "",
     city: "",
     pincode: "",
     state: "",
@@ -58,50 +38,51 @@ function CheckoutPage() {
     );
   }
 
-  const update = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const update = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     const orderId = "BK-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    
-    // 1. Prepare the data payload for Google Sheets
+
     const orderData = {
       orderId,
       date: new Date().toLocaleString(),
-      ...form, // spread name, email, phone, address, etc.
+      ...form,
       total: total,
-      // Format cart items as a single readable string, e.g., "Vanilla Cake (x2), Cocoa Powder (x1)"
-      items: detailedItems.map(it => `${it.product.name} (x${it.qty})`).join(" | ")
+      items: detailedItems.map((it) => `${it.product.name} (x${it.qty})`).join(" | "),
     };
 
     try {
-      // Save locally to show on success page
       sessionStorage.setItem(
         "bakesto.lastOrder",
-        JSON.stringify({ orderId, total, name: form.name, email: form.email, payment: form.payment }),
+        JSON.stringify({
+          orderId,
+          total,
+          name: form.name,
+          email: form.email,
+          payment: form.payment,
+        }),
       );
 
-      // 2. Send data to Google Apps Script
-      // IMPORTANT: Replace the URL below with your deployed Web App URL
-      await fetch("https://script.google.com/macros/s/AKfycbx2qumlvzw7FKfItfoeuptAL1KYCfrrJoL9HSeGaQ2dS-6qQPyWG96sB0FyEL-SUpFpsQ/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbx2qumlvzw7FKfItfoeuptAL1KYCfrrJoL9HSeGaQ2dS-6qQPyWG96sB0FyEL-SUpFpsQ/exec",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
         },
-        body: JSON.stringify(orderData),
-      });
+      );
 
-      // Clear cart and redirect
       clear();
-      navigate({ to: "/order-success", search: { id: orderId } });
-
+      navigate(`/order-success?id=${orderId}`);
     } catch (error) {
       console.error("Error saving order:", error);
       alert("There was an issue processing your order. Please try again.");
-      setSubmitting(false); // allow them to try again if it fails
+      setSubmitting(false);
     }
   };
 
@@ -120,7 +101,13 @@ function CheckoutPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium mb-1">Email</label>
-                  <input required type="email" value={form.email} onChange={update("email")} className={inputCls} />
+                  <input
+                    required
+                    type="email"
+                    value={form.email}
+                    onChange={update("email")}
+                    className={inputCls}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Full Name</label>
@@ -128,7 +115,13 @@ function CheckoutPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Phone</label>
-                  <input required type="tel" value={form.phone} onChange={update("phone")} className={inputCls} />
+                  <input
+                    required
+                    type="tel"
+                    value={form.phone}
+                    onChange={update("phone")}
+                    className={inputCls}
+                  />
                 </div>
               </div>
             </div>
@@ -138,11 +131,24 @@ function CheckoutPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium mb-1">Address</label>
-                  <input required value={form.address} onChange={update("address")} className={inputCls} />
+                  <input
+                    required
+                    value={form.address}
+                    onChange={update("address")}
+                    className={inputCls}
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Landmark <span className="text-muted-foreground font-normal">(Optional)</span></label>
-                  <input value={form.landmark} onChange={update("landmark")} placeholder="e.g. Near Apollo Hospital" className={inputCls} />
+                  <label className="block text-sm font-medium mb-1">
+                    Landmark{" "}
+                    <span className="text-muted-foreground font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    value={form.landmark}
+                    onChange={update("landmark")}
+                    placeholder="e.g. Near Apollo Hospital"
+                    className={inputCls}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">City</label>
@@ -154,7 +160,13 @@ function CheckoutPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">PIN Code</label>
-                  <input required value={form.pincode} onChange={update("pincode")} pattern="[0-9]{6}" className={inputCls} />
+                  <input
+                    required
+                    value={form.pincode}
+                    onChange={update("pincode")}
+                    pattern="[0-9]{6}"
+                    className={inputCls}
+                  />
                 </div>
               </div>
             </div>
@@ -169,7 +181,9 @@ function CheckoutPage() {
                   <label
                     key={p.id}
                     className={`flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition ${
-                      form.payment === p.id ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
+                      form.payment === p.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:bg-muted"
                     }`}
                   >
                     <input
@@ -177,7 +191,7 @@ function CheckoutPage() {
                       name="payment"
                       value={p.id}
                       checked={form.payment === p.id}
-                      onChange={() => setForm((f) => ({ ...f, payment: p.id as Form["payment"] }))}
+                      onChange={() => setForm((f) => ({ ...f, payment: p.id }))}
                       className="mt-1 accent-primary"
                     />
                     <div>
@@ -199,13 +213,19 @@ function CheckoutPage() {
               {detailedItems.map((it) => (
                 <li key={it.id} className="flex gap-3 text-sm">
                   <div className="h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-muted">
-                    <img src={it.product.image} alt={it.product.name} className="h-full w-full object-cover" />
+                    <img
+                      src={it.product.image}
+                      alt={it.product.name}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium line-clamp-2">{it.product.name}</p>
                     <p className="text-xs text-muted-foreground">Qty {it.qty}</p>
                   </div>
-                  <p className="font-semibold whitespace-nowrap">{formatINR(it.product.price * it.qty)}</p>
+                  <p className="font-semibold whitespace-nowrap">
+                    {formatINR(it.product.price * it.qty)}
+                  </p>
                 </li>
               ))}
             </ul>

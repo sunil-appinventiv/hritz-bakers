@@ -1,20 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { useCart } from "@/context/CartContext";
 import { formatINR } from "@/lib/products";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-export const Route = createFileRoute("/cart")({
-  head: () => ({
-    meta: [
-      { title: "Your Cart — Hritz Baker Mart" },
-      { name: "description", content: "Review the items in your Hritz Baker Mart cart and proceed to checkout." },
-    ],
-  }),
-  component: CartPage,
-});
+export default function Cart() {
+  usePageTitle("Your Cart — Hritz Baker Mart");
 
-function CartPage() {
   const { detailedItems, setQty, remove, subtotal, shipping, total, count } = useCart();
 
   if (count === 0) {
@@ -41,7 +34,9 @@ function CartPage() {
     <SiteLayout>
       <section className="mx-auto max-w-6xl px-4 py-12">
         <h1 className="text-3xl md:text-4xl font-bold">Your Cart</h1>
-        <p className="mt-1 text-muted-foreground">{count} item{count > 1 ? "s" : ""}</p>
+        <p className="mt-1 text-muted-foreground">
+          {count} item{count > 1 ? "s" : ""}
+        </p>
 
         <div className="mt-8 grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -51,17 +46,19 @@ function CartPage() {
                 className="flex gap-4 rounded-2xl border border-border bg-card p-4"
               >
                 <Link
-                  to="/products/$id"
-                  params={{ id: it.id }}
+                  to={`/products/${it.id}`}
                   className="h-24 w-24 sm:h-28 sm:w-28 shrink-0 overflow-hidden rounded-xl bg-muted"
                 >
-                  <img src={it.product.image} alt={it.product.name} className="h-full w-full object-cover" />
+                  <img
+                    src={it.product.image}
+                    alt={it.product.name}
+                    className="h-full w-full object-cover"
+                  />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <Link
-                      to="/products/$id"
-                      params={{ id: it.id }}
+                      to={`/products/${it.id}`}
                       className="font-semibold hover:text-primary line-clamp-2"
                     >
                       {it.product.name}
@@ -74,7 +71,9 @@ function CartPage() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  <p className="mt-1 text-sm text-primary font-bold">{formatINR(it.product.price)}</p>
+                  <p className="mt-1 text-sm text-primary font-bold">
+                    {formatINR(it.product.price)}
+                  </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="inline-flex items-center rounded-full border border-border">
                       <button

@@ -1,91 +1,61 @@
-import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { getProduct, products, formatINR } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import { Star, Minus, Plus, ShieldCheck, Truck, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-export const Route = createFileRoute("/products/$id")({
-  loader: ({ params }) => {
-    const product = getProduct(params.id);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData, params }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.product.name} — Hritz Baker Mart` },
-          { name: "description", content: loaderData.product.description },
-          { property: "og:title", content: loaderData.product.name },
-          { property: "og:description", content: loaderData.product.description },
-          { property: "og:image", content: loaderData.product.image },
-          { property: "og:type", content: "product" },
-          { property: "og:url", content: `https://dash-dash-charts.lovable.app/products/${params.id}` },
-        ]
-      : [],
-    links: loaderData
-      ? [{ rel: "canonical", href: `https://dash-dash-charts.lovable.app/products/${params.id}` }]
-      : [],
-    scripts: loaderData
-      ? [
-          {
-            type: "application/ld+json",
-            children: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Product",
-              name: loaderData.product.name,
-              description: loaderData.product.description,
-              image: loaderData.product.image,
-              brand: { "@type": "Brand", name: "Hritz Baker Mart" },
-              offers: {
-                "@type": "Offer",
-                price: loaderData.product.price,
-                priceCurrency: "INR",
-                availability:
-                  loaderData.product.stock > 0
-                    ? "https://schema.org/InStock"
-                    : "https://schema.org/OutOfStock",
-                url: `https://dash-dash-charts.lovable.app/products/${params.id}`,
-              },
-            }),
-          },
-        ]
-      : [],
-  }),
-  component: ProductDetailPage,
-  notFoundComponent: () => (
-    <SiteLayout>
-      <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="text-3xl font-bold">Product not found</h1>
-        <Link to="/products" className="mt-6 inline-block text-primary hover:underline">
-          ← Back to shop
-        </Link>
-      </div>
-    </SiteLayout>
-  ),
-});
-
-function ProductDetailPage() {
-  const { product } = Route.useLoaderData();
+export default function ProductDetail() {
+  const { id } = useParams();
+  const product = getProduct(id);
   const { add, setQty, detailedItems } = useCart();
   const navigate = useNavigate();
   const [qty, setLocalQty] = useState(1);
-  const inCart = detailedItems.find((it) => it.id === product.id);
 
-  const related = products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 4);
+  usePageTitle(
+    product
+      ? `${product.name} — Hritz Baker Mart`
+      : "Product not found — Hritz Baker Mart",
+  );
+
+  if (!product) {
+    return (
+      <SiteLayout>
+        <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+          <h1 className="text-3xl font-bold">Product not found</h1>
+          <Link to="/products" className="mt-6 inline-block text-primary hover:underline">
+            ← Back to shop
+          </Link>
+        </div>
+      </SiteLayout>
+    );
+  }
+
+  const inCart = detailedItems.find((it) => it.id === product.id);
+  const related = products
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .slice(0, 4);
 
   return (
     <SiteLayout>
       <div className="mx-auto max-w-6xl px-4 py-8">
-        <Link to="/products" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to shop
         </Link>
       </div>
 
       <section className="mx-auto max-w-6xl px-4 pb-16 grid md:grid-cols-2 gap-10">
         <div className="rounded-3xl overflow-hidden bg-muted">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover aspect-square" />
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover aspect-square"
+          />
         </div>
         <div>
           {product.tag && (
@@ -163,7 +133,7 @@ function ProductDetailPage() {
                 <button
                   onClick={() => {
                     add(product.id, qty);
-                    navigate({ to: "/checkout" });
+                    navigate("/checkout");
                   }}
                   className="hidden sm:inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-muted transition"
                 >
@@ -172,7 +142,6 @@ function ProductDetailPage() {
               </>
             )}
           </div>
-
 
           <div className="mt-8 grid grid-cols-2 gap-4">
             <div className="flex items-start gap-3 rounded-xl border border-border p-4">
@@ -201,12 +170,16 @@ function ProductDetailPage() {
               {related.map((p) => (
                 <Link
                   key={p.id}
-                  to="/products/$id"
-                  params={{ id: p.id }}
+                  to={`/products/${p.id}`}
                   className="group rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg transition"
                 >
                   <div className="aspect-square overflow-hidden bg-muted">
-                    <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition"
+                    />
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold leading-snug line-clamp-2">{p.name}</h3>

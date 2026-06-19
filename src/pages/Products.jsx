@@ -1,55 +1,36 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
-// Notice: 'products' is removed from the import. Keep 'categories' and 'Product' type.
-import { formatINR, categories, type Product } from "@/lib/products";
+import { formatINR, categories } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useState, useMemo, useEffect } from "react";
-import { Star, Minus, Plus, Loader2 } from "lucide-react";
+import { Minus, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SITE } from "@/lib/site";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-// PASTE YOUR SCRIPT URL HERE
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtaFad-axrTHvpaPMt4VEPTf8DOH4OT6HGu1Qg0rarHECad551Yuc_qzw-DCmMDaeSTw/exec";
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwtaFad-axrTHvpaPMt4VEPTf8DOH4OT6HGu1Qg0rarHECad551Yuc_qzw-DCmMDaeSTw/exec";
 
-export const Route = createFileRoute("/products")({
-  head: () => ({
-    meta: [
-      { title: `Products — ${SITE.name}` },
-      {
-        name: "description",
-        content: `Browse ${SITE.name}'s collection of baking essentials, cake mixes, flavoring extracts, and decorating tools.`,
-      },
-      { property: "og:title", content: `Products — ${SITE.name}` },
-      { property: "og:description", content: "Baking essentials, cake mixes & decorating tools." },
-    ],
-  }),
-  component: ProductsPage,
-});
+export default function Products() {
+  usePageTitle(`Products — ${SITE.name}`);
 
-function ProductsPage() {
-  const [cat, setCat] = useState<string>("all");
-  const [subCat, setSubCat] = useState<string>("");
+  const [cat, setCat] = useState("all");
+  const [subCat, setSubCat] = useState("");
   const [query, setQuery] = useState("");
-  
-  // New States for fetching data
-  const [productsList, setProductsList] = useState<Product[]>([]);
+  const [productsList, setProductsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch products on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(SCRIPT_URL);
         const data = await response.json();
-        
-        // Ensure numbers are parsed correctly from Google Sheets
-        const formattedData = data.map((item: any) => ({
+        const formattedData = data.map((item) => ({
           ...item,
           price: Number(item.price),
           rating: Number(item.rating),
           stock: Number(item.stock),
         }));
-        
         setProductsList(formattedData);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -64,7 +45,6 @@ function ProductsPage() {
 
   const activeCategoryObj = categories.find((c) => c.id === cat);
 
-  // Update visible logic to use the fetched productsList
   const visible = useMemo(() => {
     return productsList.filter((p) => {
       const matchCat = cat === "all" || p.category === cat;
@@ -74,12 +54,12 @@ function ProductsPage() {
     });
   }, [productsList, cat, subCat, query]);
 
-  const handleCategoryChange = (categoryId: string) => {
+  const handleCategoryChange = (categoryId) => {
     setCat(categoryId);
     setSubCat("");
   };
 
-  const handleSubCatToggle = (subCategoryId: string) => {
+  const handleSubCatToggle = (subCategoryId) => {
     setSubCat((prev) => (prev === subCategoryId ? "" : subCategoryId));
   };
 
@@ -96,7 +76,6 @@ function ProductsPage() {
 
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="flex flex-col md:flex-row gap-4 md:items-start md:justify-between mb-8">
-          
           <div className="flex-1">
             <div className="flex flex-wrap gap-2">
               {categories.map((c) => (
@@ -114,7 +93,7 @@ function ProductsPage() {
               ))}
             </div>
 
-            {activeCategoryObj?.subcategories && activeCategoryObj.subcategories.length > 0 && (
+            {activeCategoryObj?.subcategories?.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3 pl-2 border-l-2 border-primary/20">
                 {activeCategoryObj.subcategories.map((sc) => (
                   <button
@@ -142,7 +121,6 @@ function ProductsPage() {
           />
         </div>
 
-        {/* Dynamic State Rendering */}
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin mb-4 text-primary" />
@@ -162,15 +140,14 @@ function ProductsPage() {
   );
 }
 
-function ProductCard({ product: p }: { product: Product }) {
+function ProductCard({ product: p }) {
   const { add, setQty, detailedItems } = useCart();
   const inCart = detailedItems.find((it) => it.id === p.id);
-  
+
   return (
     <article className="group rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg transition flex flex-col">
       <Link
-        to="/products/$id"
-        params={{ id: p.id }}
+        to={`/products/${p.id}`}
         className="relative aspect-square overflow-hidden bg-muted block"
       >
         <img
@@ -179,7 +156,8 @@ function ProductCard({ product: p }: { product: Product }) {
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
           onError={(e) => {
-            e.currentTarget.src = "https://placehold.co/400x400/eeeeee/999999?text=Image+Not+Found";
+            e.currentTarget.src =
+              "https://placehold.co/400x400/eeeeee/999999?text=Image+Not+Found";
           }}
         />
         {p.tag && (
@@ -190,16 +168,11 @@ function ProductCard({ product: p }: { product: Product }) {
       </Link>
       <div className="p-4 flex flex-col flex-1">
         <Link
-          to="/products/$id"
-          params={{ id: p.id }}
+          to={`/products/${p.id}`}
           className="font-semibold leading-snug hover:text-primary line-clamp-2"
         >
           {p.name}
         </Link>
-        {/* <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-          <span>{p.rating.toFixed(1)}</span>
-        </div> */}
         <div className="mt-3 flex items-center justify-between gap-2">
           <span className="text-lg font-bold text-primary">{formatINR(p.price)}</span>
           {inCart ? (
@@ -238,9 +211,9 @@ function ProductCard({ product: p }: { product: Product }) {
                 toast.success(`${p.name} added to cart`);
               }}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                p.stock <= 0 
-                ? "bg-muted text-muted-foreground cursor-not-allowed" 
-                : "bg-foreground/90 text-background hover:bg-foreground"
+                p.stock <= 0
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-foreground/90 text-background hover:bg-foreground"
               }`}
             >
               {p.stock <= 0 ? "Out of Stock" : "Add to Cart"}

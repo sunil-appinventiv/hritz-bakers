@@ -1,35 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, useSearchParams } from "react-router-dom";
 import SiteLayout from "@/components/SiteLayout";
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatINR } from "@/lib/products";
-import { z } from "zod";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-const searchSchema = z.object({ id: z.string().optional() });
+export default function OrderSuccess() {
+  usePageTitle("Order Confirmed — Hritz Baker Mart");
 
-export const Route = createFileRoute("/order-success")({
-  validateSearch: searchSchema,
-  head: () => ({
-    meta: [
-      { title: "Order Confirmed — Hritz Baker Mart" },
-      { name: "description", content: "Your Hritz Baker Mart order has been successfully placed — thank you for choosing us for your baking needs." },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: SuccessPage,
-});
-
-type StoredOrder = {
-  orderId: string;
-  total: number;
-  name: string;
-  email: string;
-  payment: string;
-};
-
-function SuccessPage() {
-  const { id } = Route.useSearch();
-  const [order, setOrder] = useState<StoredOrder | null>(null);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [order, setOrder] = useState(null);
 
   useEffect(() => {
     try {

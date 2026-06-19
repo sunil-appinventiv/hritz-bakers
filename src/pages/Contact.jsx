@@ -1,49 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
 import SiteLayout from "@/components/SiteLayout";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 import { SITE } from "@/lib/site";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
-export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: `Contact — ${SITE.name}` },
-      {
-        name: "description",
-        content: `Get in touch with ${SITE.name}. We'd love to hear from you — questions, custom orders, or feedback.`,
-      },
-      { property: "og:title", content: `Contact — ${SITE.name}` },
-      {
-        property: "og:description",
-        content: `Reach out to the ${SITE.name} team.`,
-      },
-    ],
-  }),
-  component: ContactPage,
-});
+export default function Contact() {
+  usePageTitle(`Contact — ${SITE.name}`);
 
-function ContactPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "", 
+    phone: "",
     message: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Custom handling for phone input
     if (name === "phone") {
-      // Remove all non-numeric characters
       const numericValue = value.replace(/\D/g, "");
-      
-      // Ensure it doesn't exceed 10 digits
       if (numericValue.length <= 10) {
         setFormData((prev) => ({
           ...prev,
@@ -51,22 +29,18 @@ function ContactPage() {
         }));
       }
     } else {
-      // Handle all other inputs normally
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
-    
+
     setSent(false);
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Extra safeguard before sending data
     if (formData.phone.length !== 10) {
       alert("Please enter a valid 10-digit phone number.");
       return;
@@ -85,11 +59,10 @@ function ContactPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-        }
+        },
       );
 
       setSent(true);
-
       setFormData({
         name: "",
         email: "",
@@ -108,9 +81,7 @@ function ContactPage() {
     <SiteLayout>
       <section className="bg-secondary/40 py-16">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            Get in Touch
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold">Get in Touch</h1>
           <p className="mt-4 text-lg text-muted-foreground">
             We'd love to hear from you. Drop us a message anytime.
           </p>
@@ -147,15 +118,10 @@ function ContactPage() {
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground">
-                  {c.label}
-                </p>
+                <p className="text-sm text-muted-foreground">{c.label}</p>
 
                 {c.href ? (
-                  <a
-                    href={c.href}
-                    className="font-semibold hover:text-primary"
-                  >
+                  <a href={c.href} className="font-semibold hover:text-primary">
                     {c.value}
                   </a>
                 ) : (
@@ -171,10 +137,7 @@ function ContactPage() {
           className="rounded-2xl border border-border bg-card p-6 space-y-4"
         >
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Name
-            </label>
-
+            <label className="block text-sm font-medium mb-1">Name</label>
             <input
               required
               type="text"
@@ -186,10 +149,7 @@ function ContactPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
-
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
               required
               type="email"
@@ -201,10 +161,7 @@ function ContactPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Contact Number
-            </label>
-
+            <label className="block text-sm font-medium mb-1">Contact Number</label>
             <input
               required
               type="tel"
@@ -220,10 +177,7 @@ function ContactPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Message
-            </label>
-
+            <label className="block text-sm font-medium mb-1">Message</label>
             <textarea
               required
               rows={5}
