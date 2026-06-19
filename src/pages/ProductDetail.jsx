@@ -10,7 +10,7 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 export default function ProductDetail() {
   const { id } = useParams();
   const product = getProduct(id);
-  const { add, setQty, detailedItems } = useCart();
+  const { add, setQty, items } = useCart();
   const navigate = useNavigate();
   const [qty, setLocalQty] = useState(1);
 
@@ -33,7 +33,7 @@ export default function ProductDetail() {
     );
   }
 
-  const inCart = detailedItems.find((it) => it.id === product.id);
+  const inCart = items.find((it) => it.id === product.id);
   const related = products
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4);
@@ -123,7 +123,7 @@ export default function ProductDetail() {
                 </div>
                 <button
                   onClick={() => {
-                    add(product.id, qty);
+                    add(product, qty);
                     toast.success(`${product.name} added to cart`);
                   }}
                   className="flex-1 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition"
@@ -132,7 +132,7 @@ export default function ProductDetail() {
                 </button>
                 <button
                   onClick={() => {
-                    add(product.id, qty);
+                    add(product, qty);
                     navigate("/checkout");
                   }}
                   className="hidden sm:inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-muted transition"

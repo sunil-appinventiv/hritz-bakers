@@ -11,6 +11,7 @@ import { products, type Product } from "@/lib/products";
 export type CartItem = {
   id: string;
   qty: number;
+  product?: Product;
 };
 
 type CartContextValue = {
@@ -20,7 +21,7 @@ type CartContextValue = {
   subtotal: number;
   shipping: number;
   total: number;
-  add: (id: string, qty?: number) => void;
+  add: (product: Product, qty?: number) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   clear: () => void;
@@ -28,6 +29,10 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "bakesto.cart.v1";
+
+function resolveProduct(item: CartItem): Product | undefined {
+  return item.product ?? products.find((p) => p.id === item.id);
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -51,7 +56,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     const detailedItems = items
       .map((it) => {
-        const product = products.find((p) => p.id === it.id);
+        const product = resolveProduct(it);
         return product ? { ...it, product } : null;
       })
       .filter((x): x is CartItem & { product: Product } => x !== null);
@@ -71,15 +76,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       shipping,
       total,
-      add: (id, qty = 1) =>
+      add: (product, qty = 1) =>
         setItems((prev) => {
-          const existing = prev.find((i) => i.id === id);
+          const existing = prev.find((i) => i.id === product.id);
           if (existing) {
             return prev.map((i) =>
-              i.id === id ? { ...i, qty: i.qty + qty } : i,
+              i.id === product.id
+                ? { ...i, qty: i.qty + qty, product: i.product ?? product }
+                : i,
             );
           }
-          return [...prev, { id, qty }];
+          return [...prev, { id: product.id, qty, product }];
         }),
       remove: (id) => setItems((prev) => prev.filter((i) => i.id !== id)),
       setQty: (id, qty) =>

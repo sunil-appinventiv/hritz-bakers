@@ -141,8 +141,8 @@ export default function Products() {
 }
 
 function ProductCard({ product: p }) {
-  const { add, setQty, detailedItems } = useCart();
-  const inCart = detailedItems.find((it) => it.id === p.id);
+  const { add, setQty, items } = useCart();
+  const inCart = items.find((it) => it.id === p.id);
 
   return (
     <article className="group rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg transition flex flex-col">
@@ -207,7 +207,7 @@ function ProductCard({ product: p }) {
                   toast.error(`${p.name} is out of stock.`);
                   return;
                 }
-                add(p.id);
+                add(p);
                 toast.success(`${p.name} added to cart`);
               }}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
